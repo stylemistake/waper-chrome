@@ -9,7 +9,15 @@
 		"128": "icon_128.png"
 	},
 	"name": "Waper",
-	"permissions": [ "tabs", "notifications", "http://waper.ru/" ],
+	"permissions": [ "tabs", "notifications", "storage", "http://waper.ru/" ],
 	"web_accessible_resources": [ "icon_128.png" ],
-	"version": "0.1"
+    "content_scripts": [
+        {
+            "matches": [ "http://waper.ru/*" ],
+            "css": [],
+            "js": [ "js/jquery.js", "js/content.js" ],
+            "run_at": "document_start"
+        }
+    ],
+	"version": "0.2"
 }

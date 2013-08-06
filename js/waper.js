@@ -23,7 +23,7 @@ var Waper = (function() {
 			url: base_url + resource,
 			type: method,
 			data: data,
-			timeout: 5000,
+			timeout: 14000,
 			success: success,
 			error: function( a, b, c ) {
 				try {
@@ -57,8 +57,8 @@ var Waper = (function() {
 		request( "GET", url, function( data ) {
 			var $body = $( data, side_context ).filter(".body");
 
-			var $messages = $body.find("a[href*=inbox]");
-			var $posts = $body.find("a[href*=post]");
+			var $messages = $body.find("a[href='/office/talk/inbox/']");
+			var $posts = $body.find("a[href*='/forum/post/']");
 
 			var $messages_inbox = $( data, side_context ).find("small.info");
 
@@ -73,26 +73,27 @@ var Waper = (function() {
 				}
 				if ( notif_persist.posts.indexOf( data.id ) < 0 ) {
 					notif_persist.posts.push( data.id );
-					fireEvent( 'new_post', data );
+					fireEvent( 'new_notification', data );
 				}
 			});
 
-			// if ( $messages.length > 0 ) {
-			// 	getNotifications("/r/ib.r");
-			// 	return true;
-			// }
+			if ( $messages.length > 0 ) {
+				getNotifications("/r/ib.r");
+				return true;
+			}
 
 			$messages_inbox.each( function() {
 				var $msg_body = $(this).parent().next();
 				var data = {
 					id: $msg_body.find("a").attr("href").match(/mid=([0-9]+)/)[1],
-					url: base_url + $msg_body.find("a").attr("href"),
+					url: base_url + $msg_body.find("a[href*='/office/talk/?id']").attr("href"),
 					name: $(this).parent().find("a").text(),
 					message: $msg_body.find("br")[0].previousSibling.nodeValue
 				}
+				console.log( data );
 				if ( notif_persist.messages.indexOf( data.id ) < 0 ) {
 					notif_persist.messages.push( data.id );
-					fireEvent( 'new_message', data );
+					fireEvent( 'new_notification', data );
 				}
 			});
 		});
@@ -101,7 +102,7 @@ var Waper = (function() {
 	$(document).ready( function() {
 		(function loop() {
 			getNotifications();
-			setTimeout( loop, 10000 );
+			setTimeout( loop, 15000 );
 		})();
 	})
 

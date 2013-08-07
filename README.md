@@ -12,6 +12,11 @@ http://waper.ru/forum/topic/771266)
 
 **Changelog:** *(russian)*
 ```
+version 0.4:
+[add] Замена favicon
+[fix] Исправлен баг со шрифтом
+[fix] Исправлен баг с кодировкой
+
 version 0.3:
 [add] Меню конфигурации
 [add] Загрузка текста сообщений в оповещения

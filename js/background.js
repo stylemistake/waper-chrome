@@ -35,7 +35,7 @@
 	}
 
 	function notify( name, msg, url, timeout ) {
-		var n = webkitNotifications.createNotification( 'icon_128.png', name, msg );
+		var n = webkitNotifications.createNotification( 'assets/icon_128.png', name, msg );
 		n.show();
 		n.onclick = function() {
 			n.cancel();

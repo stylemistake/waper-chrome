@@ -7,12 +7,11 @@ var Waper = (function() {
 
 	var version = {
 		major: 0,
-		minor: 3,
+		minor: 4,
 		changes: [
-			"[add] Меню конфигурации",
-			"[add] Загрузка текста сообщений в оповещения",
-			"[add] Оптимизация запросов",
-			"[fix] Мелкие багфиксы",
+			"[add] Замена favicon у waper.ru",
+			"[fix] Исправлен баг со шрифтом",
+			"[fix] Исправлен баг с кодировкой",
 		],
 		url: "http://waper.ru/forum/topic/771266?pid=21782755"
 	};

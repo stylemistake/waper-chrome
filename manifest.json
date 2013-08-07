@@ -2,23 +2,23 @@
 	"manifest_version": 2,
 	"background": { "scripts" : [ "js/jquery.js", "js/waper.js", "js/background.js" ] },
 	"browser_action": {
-		"default_icon": "icon.png",
+		"default_icon": "assets/icon.png",
 		"default_popup": "popup.html"
 	},
 	"description": "This extension fully integrates Waper into Chrome browser. Better notifications, better messaging, better browsing.",
 	"icons": {
-		"128": "icon_128.png"
+		"128": "assets/icon_128.png"
 	},
 	"name": "Waper",
 	"permissions": [ "tabs", "notifications", "storage", "http://waper.ru/" ],
-	"web_accessible_resources": [ "icon_128.png" ],
-    "content_scripts": [
-        {
-            "matches": [ "http://waper.ru/*" ],
-            "css": [],
-            "js": [ "js/jquery.js", "js/content.js" ],
-            "run_at": "document_start"
-        }
-    ],
+	"web_accessible_resources": [ "assets/icon_128.png", "assets/icon.png" ],
+	"content_scripts": [
+		{
+			"matches": [ "http://waper.ru/*" ],
+			"css": [],
+			"js": [ "js/jquery.js", "js/content.js" ],
+			"run_at": "document_start"
+		}
+	],
 	"version": "0.3"
 }

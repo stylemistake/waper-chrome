@@ -18,7 +18,6 @@
 	});
 
 
-
 	// When clicked on icon, focus to the near Waper tab
 	// otherwise create one
 

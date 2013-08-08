@@ -4,7 +4,6 @@ var Waper = (function() {
 	// otherwise notify user about that via console
 	if ( typeof jQuery == 'undefined' ) throw new Error("jQuery is required; check the script order.");
 
-
 	var version = {
 		major: 0,
 		minor: 4,
@@ -13,10 +12,8 @@ var Waper = (function() {
 			"[fix] Исправлен баг со шрифтом",
 			"[fix] Исправлен баг с кодировкой",
 		],
-		url: "http://waper.ru/forum/topic/771266?pid=21782755"
+		url: "http://waper.ru/forum/topic/771266"
 	};
-
-
 
 	var base_url = "http://waper.ru";
 
@@ -24,16 +21,18 @@ var Waper = (function() {
 		update_interval: 10000,
 		enable_inbox_checks: true,
 		enable_forum_checks: true,
+		enable_analytics: true,
 	};
 
 	var events = {};
 
 
 	chrome.storage.sync.get( "config", function( data ) {
-		if ( data.config !== undefined ) {
-			config = data.config;
-			console.log("Configuration loaded!");
-		}
+		if ( data.config === undefined ) return true;
+		$.each( data.config, function( key, value ) {
+			config[key] = value;
+			console.log( "config: loaded " + key );
+		});
 	});
 
 
@@ -84,19 +83,27 @@ var Waper = (function() {
 		posts: [],
 		messages: [],
 	};
+	var info_persist = {};
 
 	function getSimpleNotifications( callback ) {
 		if ( callback === undefined ) callback = function(){};
 		request( "GET", "/office/", function( data ) {
 			var $html = $( data, side_context );
-			var messages = $html.find("a[href='/office/talk/inbox/']").text().match(/[0-9]+/);
-			var posts    = $html.find("a[href='/office/notify/']").text().match(/[0-9]+/);
+			var messages  = $html.find("a[href='/office/talk/inbox/']").text().match(/[0-9]+/);
+			var posts     = $html.find("a[href='/office/notify/']").text().match(/[0-9]+/);
+			var userid    = $html.find("a[href*='/user/friend/']").attr("href");
 
 			var info = {
 				post_count: posts === null ? 0 : parseInt( posts[0] ),
 				message_count: messages === null ? 0 : parseInt( messages[0] ),
+				userid: userid === undefined ? "logged_out" : userid.match(/[0-9]+/)[0],
+				username: $html.find("a[href='/office/']").text(),
 			};
-			console.log( info );
+
+			Track.app_data = {
+				version: version.major + "." + version.minor,
+				userid: info.userid
+			};
 
 			fireEvent( 'notifications_available', info );
 			callback( info );
@@ -174,12 +181,26 @@ var Waper = (function() {
 		});
 	}
 
+
+
 	$(document).ready( function() {
+
+		// Notification loop
 		(function loop() {
 			getSimpleNotifications( function() {
 				setTimeout( loop, 10000 );
 			});
 		})();
+
+		// Analytics loop
+		(function loop() {
+			if ( config.enable_analytics ) {
+				var status = Track.app();
+				if ( status ) { setTimeout( loop, 60000 ); return true; }
+			}
+			setTimeout( loop, 5000 );
+		})();
+
 	})
 
 	bindEvent( 'notifications_available', function( info ) {
@@ -193,6 +214,8 @@ var Waper = (function() {
 		});
 	});
 
+
+
 	return {
 		base_url: base_url,
 		request: request,
@@ -202,7 +225,7 @@ var Waper = (function() {
 		setConfig: function( new_conf ) {
 			chrome.storage.sync.set({ config: new_conf }, function() {
 				config = new_conf;
-				console.log("Configuration saved.");
+				console.log("config: updated");
 			});
 		},
 		version: version

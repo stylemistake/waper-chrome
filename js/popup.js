@@ -5,14 +5,14 @@ var bg = chrome.extension.getBackgroundPage();
 	var config = bg.Waper.getConfig();
 	var version = bg.Waper.version;
 
-	function updateTraffic() {
-		var base_traffic = 430;
-		$("div.item.checkbox").each( function() {
-			var traffic = $(this).attr("data-traffic");
-			base_traffic += $(this).hasClass("active") ? parseInt(traffic) : 0;
-		});
-		$("#traffic").html( base_traffic );
-	}
+	// function updateTraffic() {
+	// 	var base_traffic = 430;
+	// 	$("div.item.checkbox").each( function() {
+	// 		var traffic = $(this).attr("data-traffic");
+	// 		base_traffic += $(this).hasClass("active") ? parseInt(traffic) : 0;
+	// 	});
+	// 	$("#traffic").html( base_traffic );
+	// }
 
 	function focus( url ) {
 		chrome.tabs.query( { url: "http://waper.ru/*" }, function( tabs ) {
@@ -34,7 +34,6 @@ var bg = chrome.extension.getBackgroundPage();
 		$("div.item.checkbox").each( function() {
 			var param = $(this).attr("data-param");
 			$(this).toggleClass( "active", config[param] );
-			updateTraffic();
 		});
 
 		// Action bindings
@@ -43,8 +42,8 @@ var bg = chrome.extension.getBackgroundPage();
 			var value = $(this).hasClass("active");
 			config[param] = !value;
 			$(this).toggleClass( "active", config[param] );
+			bg.Track.event( "Popup", "Change settings", param + " - " + ( value ? "disabled" : "enabled" ) );
 			bg.Waper.setConfig( config );
-			updateTraffic();
 		});
 
 		$("div.item.link").on( "click", function() {

@@ -16,8 +16,8 @@
 	"content_scripts": [
 		{
 			"matches": [ "http://waper.ru/*" ],
-			"css": [],
-			"js": [ "js/jquery.js", "js/content.js" ],
+			"css": ["css/wbbtheme.css"],
+			"js": [ "js/jquery.js", "js/wysibb.js", "js/content.js" ],
 			"run_at": "document_start"
 		}
 	],

@@ -22,6 +22,10 @@ var Waper = (function() {
 		enable_inbox_checks: true,
 		enable_forum_checks: true,
 		enable_analytics: true,
+		subscriptions: {
+			topics: [],
+			messages: []
+		},
 	};
 
 	var events = {};

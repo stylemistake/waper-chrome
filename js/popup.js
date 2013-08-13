@@ -31,24 +31,24 @@ var bg = chrome.extension.getBackgroundPage();
 		// Initialization
 		$("#version").html( version.major + "." + version.minor );
 
-		$("div.item.checkbox").each( function() {
+		$("div.item.link").on( "click", function() {
+			var url = $(this).attr("data-href");
+			focus( url );
+		});
+
+		$("#config div.item.checkbox").each( function() {
 			var param = $(this).attr("data-param");
 			$(this).toggleClass( "active", config[param] );
 		});
 
 		// Action bindings
-		$("div.item.checkbox").on( "click", function() {
+		$("#config div.item.checkbox").on( "click", function() {
 			var param = $(this).attr("data-param");
 			var value = $(this).hasClass("active");
 			config[param] = !value;
 			$(this).toggleClass( "active", config[param] );
 			bg.Track.event( "Popup", "Change settings", param + " - " + ( value ? "disabled" : "enabled" ) );
 			bg.Waper.setConfig( config );
-		});
-
-		$("div.item.link").on( "click", function() {
-			var url = $(this).attr("data-href");
-			focus( url );
 		});
 
 	});

@@ -23,24 +23,35 @@ body, html {
 	margin: 0px;
 }
 
+.item.checkbox {
+	background: #FFFFFF url('assets/checkbox-inactive.png') no-repeat;
+}
+
+.item.checkbox:hover {
+	background: #114662 url('assets/checkbox-inactive-hover.png') no-repeat;
+}
+
 .item.checkbox.active {
-	background: #FFFFFF url('assets/checkbox.png') no-repeat;
+	background: #FFFFFF url('assets/checkbox-active.png') no-repeat;
 }
 
 .item.checkbox.active:hover {
-	background: #114662 url('assets/checkbox-hover.png') no-repeat;
+	background: #114662 url('assets/checkbox-active-hover.png') no-repeat;
 }
 
 .item.checkbox:hover, .item.link:hover {
-	background: #114662;
+	background-color: #114662 !important;
 	color: #FFF;
 	cursor: pointer;
 }
 
 .item.checkbox:active, .item.link:active {
-	background: #082230;
+	background-color: #082230 !important;
 	color: #FFF;
 }
+
+.bold { font-weight: bold; }
+.hidden { display: none; }
 </style>
 <script src="js/jquery.js"></script>
 <script src="js/popup.js"></script>
@@ -49,10 +60,18 @@ body, html {
 	<div class="body">
 		<div class="item link" data-href="http://waper.ru/office/">Личный кабинет</div>
 		<hr>
-		<div class="item checkbox" data-param="enable_forum_checks" data-traffic="124">Получать текст ответов на форуме</div>
-		<div class="item checkbox" data-param="enable_inbox_checks" data-traffic="225">Получать текст личных сообщений</div>
+		<div id="config">
+			<div class="item checkbox" data-param="enable_forum_checks">Получать текст ответов на форуме</div>
+			<div class="item checkbox" data-param="enable_inbox_checks">Получать текст личных сообщений</div>
+		</div>
+		<div id="subscriptions">
+			<hr>
+			<div class="item link" data-href="http://waper.ru/forum/13"><b>Сообщество:</b> Siemens-Club</div>
+			<div class="item checkbox" data-param="enable_forum_checks">Получать новые темы</div>
+			<div class="item checkbox" data-param="enable_inbox_checks">Получать новые посты</div>
+			<div class="item link" data-href="http://waper.ru/forum/13">Пользователи онлайн</div>
+		</div>
 		<hr>
-		<!--<div class="item">Расход трафика: <span id="traffic">0</span> KB/час (сред.)</div>-->
 		<div class="item link" data-href="http://waper.ru/forum/topic/771266?pid=21782755">Support forum (тек. версия: <span id="version">?</span>)</div>
 	</div>
 </body>

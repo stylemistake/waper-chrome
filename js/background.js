@@ -55,7 +55,6 @@
 		} else {
 			chrome.browserAction.setBadgeText({ text: "" + notification_count });
 		}
-		
 	}
 
 

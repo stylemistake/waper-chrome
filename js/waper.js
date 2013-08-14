@@ -37,7 +37,6 @@ var Waper = (function() {
 	chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
 		if ( request.group === undefined || request.group.name === undefined ) return false;
 		current_group = request.group;
-		console.log( request.group );
 	});
 
 	// Load config and sync in a background loop
@@ -49,13 +48,11 @@ var Waper = (function() {
 			});
 		}
 
-		config.subscriptions = [];
-
 		(function loop() {
 			chrome.storage.sync.set({ config: config }, function() {
 				console.log("config: saved");
 			});
-			console.log( config.subscriptions );
+			console.log( "Current subscriptions: ", config.subscriptions );
 			setTimeout( loop, 30000 );
 		})();
 	});
@@ -235,7 +232,7 @@ var Waper = (function() {
 					}
 				}
 			});
-			subscr_data.date_updated = new Date().getTime();
+			subscr_data.date_updated = (new Date()).getTime() - 1000;
 		});
 	}
 
@@ -258,7 +255,7 @@ var Waper = (function() {
 					}
 				}
 			});
-			subscr_data.date_updated = new Date().getTime();
+			subscr_data.date_updated = (new Date()).getTime() - 1000;
 		});
 	}
 

@@ -35,10 +35,7 @@ $(document).ready( function() {
 			}
 		});
 
-		console.log( link );
-
 		function sendGroup( group ) {
-			console.log( group );
 			if ( group.name == "В сообщество" ) group.name = undefined;
 			if ( group.id == 1 ) group.name = "Siemens-Club";
 			chrome.runtime.sendMessage({ group: group });

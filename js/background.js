@@ -85,5 +85,14 @@
 		notify( data.name, data.message, data.url );
 	});
 
+	Waper.bind( 'new_group_topic', function( data ) {
+		notify( data.name, data.message, data.url, 9500 );
+	});
+
+	Waper.bind( 'new_group_post', function( data ) {
+		notify( data.name, data.message, data.url, 9500 );
+	});
+
+
 
 })();

@@ -6,11 +6,13 @@ var Waper = (function() {
 
 	var version = {
 		major: 0,
-		minor: 4,
+		minor: 5,
 		changes: [
-			"[add] Замена favicon у waper.ru",
-			"[fix] Исправлен баг со шрифтом",
-			"[fix] Исправлен баг с кодировкой",
+			"[add] WysiBB редактор",
+			"[add] Вырезание рекламы",
+			"[add] Подписки на сообщества",
+			"[fix] Выпрямление ссылок без биндов на клик",
+			"[fix] Нотификации теперь не должны застрявать"
 		],
 		url: "http://waper.ru/forum/topic/771266"
 	};
@@ -22,23 +24,41 @@ var Waper = (function() {
 		enable_inbox_checks: true,
 		enable_forum_checks: true,
 		enable_analytics: true,
-		subscriptions: {
-			topics: [],
-			messages: []
-		},
+		subscriptions: {},
 	};
 
 	var events = {};
 
+	var friends_online = [];
 
-	chrome.storage.sync.get( "config", function( data ) {
-		if ( data.config === undefined ) return true;
-		$.each( data.config, function( key, value ) {
-			config[key] = value;
-			console.log( "config: loaded " + key );
-		});
+
+	// Always know about the current group user stays in
+	var current_group = {};
+	chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
+		if ( request.group === undefined || request.group.name === undefined ) return false;
+		current_group = request.group;
+		console.log( request.group );
 	});
 
+	// Load config and sync in a background loop
+	chrome.storage.sync.get( "config", function( data ) {
+		if ( data.config !== undefined ) {
+			$.each( data.config, function( key, value ) {
+				config[key] = value;
+				console.log( "config: loaded " + key );
+			});
+		}
+
+		config.subscriptions = [];
+
+		(function loop() {
+			chrome.storage.sync.set({ config: config }, function() {
+				console.log("config: saved");
+			});
+			console.log( config.subscriptions );
+			setTimeout( loop, 30000 );
+		})();
+	});
 
 	function request( method, resource, data, success, failure ) {
 		// THIS IS FOR: request( method, url, success, failure )
@@ -48,7 +68,6 @@ var Waper = (function() {
 		if ( failure === undefined ) failure = function( data ) {
 			console.log( "error: " + data.message );
 		};
-
 		$.ajax({
 			url: base_url + resource,
 			type: method,
@@ -59,8 +78,8 @@ var Waper = (function() {
 				try {
 					var data = $.parseJSON( a.responseText );
 					failure( data );
-				} catch( e ) {
-					failure( c );
+				} catch (e) {
+					failure( b );
 				}
 			}
 		});
@@ -85,11 +104,13 @@ var Waper = (function() {
 	var rss = {};
 	var notif_persist = {
 		posts: [],
+		topics: [],
 		messages: [],
+		friends_online: [],
 	};
 	var info_persist = {};
 
-	function getSimpleNotifications( callback ) {
+	function getSimpleNotifications( callback, fallback ) {
 		if ( callback === undefined ) callback = function(){};
 		request( "GET", "/office/", function( data ) {
 			var $html = $( data, side_context );
@@ -111,7 +132,7 @@ var Waper = (function() {
 
 			fireEvent( 'notifications_available', info );
 			callback( info );
-		});
+		}, fallback );
 	}
 
 	function getForumNotifications() {
@@ -134,7 +155,7 @@ var Waper = (function() {
 						var sender = $tpanel.find("a[href*='/user/']").text();
 
 						notif_data.message = $body.find(".mpanel").text().match(/:\s?(.*)/)[1];
-						notif_data.name = sender + " (" + notif_data.name + ")";
+						notif_data.name = sender + " " + notif_data.name;
 						fireEvent( 'new_post', notif_data );
 					});
 				}
@@ -161,6 +182,83 @@ var Waper = (function() {
 					fireEvent( 'new_message', notif_data );
 				}
 			});
+		});
+	}
+
+	// function getOnlineFriends() {
+	// 	request( "GET", "/office/friend/online.php", function( data ) {
+	// 		var $body  = $( data, side_context ).filter(".body");
+	// 		var $items = $body.find("a[href*='/user/']");
+	// 		friends_online = [];
+
+	// 		$items.each( function() {
+	// 			var notif_data = {
+	// 				id: $(this).attr("href").match(/[0-9]+/)[0],
+	// 				url: $(this).attr("href"),
+	// 				name: $(this).text(),
+	// 				message: "Online",
+	// 				location: {
+	// 					name: $(this).next().text(),
+	// 					url: $(this).next().attr("href")
+	// 				},
+	// 			};
+	// 			friends_online.push( notif_data );
+	// 			console.log( notif_data );
+	// 		});
+
+	// 		$.each( friends_online, function( key, value ) {
+	// 			if ( value) else {
+	// 				fireEvent( 'friend_offline', notif_data );
+	// 				console.log( notif_data );
+	// 			}
+	// 		});
+	// 	});
+	// }
+
+	function getGroupTopicNotifications( subscr_data ) {
+		request( "GET", "/rss/topic" + subscr_data.group_id + ".xml", function( data ) {
+			var $xml = $( data, side_context );
+			var $items = $xml.find("item");
+			var title = $( $xml.find("title")[0] ).text().match(/"(.*?)"/)[1];
+			$items.each( function() {
+				var notif_data = {
+					id: $(this).find("guid").text().match(/[0-9]+/)[0],
+					url: $(this).find("guid").text(),
+					name: "Новая тема в " + title,
+					message: $(this).find("title").text().trim()
+				};
+				if ( notif_persist.topics.indexOf( notif_data.id ) < 0 ) {
+					notif_persist.topics.push( notif_data.id );
+					var date = subscr_data.date_updated;
+					if ( date !== undefined && Helpers.getDateDiff( date ) > config.update_interval ) {
+						fireEvent( 'new_group_topic', notif_data );
+					}
+				}
+			});
+			subscr_data.date_updated = new Date().getTime();
+		});
+	}
+
+	function getGroupPostNotifications( subscr_data ) {
+		request( "GET", "/rss/post" + subscr_data.group_id + ".xml", function( data ) {
+			var $xml = $( data, side_context );
+			var $items = $xml.find("item");
+			$items.each( function() {
+				var notif_data = {
+					id: $(this).find("guid").text().match(/[0-9]+/)[0],
+					url: $(this).find("guid").text(),
+					name: $(this).find("title").text().trim().match(/от\s(.*)/)[1],
+					message: $(this).find("description").text().trim().replace(/(<([^>]+)>)/ig,"")
+				};
+				if ( notif_persist.posts.indexOf( notif_data.id ) < 0 ) {
+					notif_persist.posts.push( notif_data.id );
+					var date = subscr_data.date_updated;
+					if ( date !== undefined && Helpers.getDateDiff( date ) >= config.update_interval ) {
+						fireEvent( 'new_group_post', notif_data );
+					}
+				}
+			});
+			subscr_data.date_updated = new Date().getTime();
 		});
 	}
 
@@ -192,7 +290,14 @@ var Waper = (function() {
 		// Notification loop
 		(function loop() {
 			getSimpleNotifications( function() {
-				setTimeout( loop, 10000 );
+				for ( var i in config.subscriptions ) {
+					var data = config.subscriptions[i];
+					if ( data.receive_topics ) getGroupTopicNotifications( data );
+					if ( data.receive_posts  ) getGroupPostNotifications( data );
+				}
+				setTimeout( loop, config.update_interval );
+			}, function() {
+				setTimeout( loop, config.update_interval );
 			});
 		})();
 
@@ -205,7 +310,7 @@ var Waper = (function() {
 			setTimeout( loop, 5000 );
 		})();
 
-	})
+	});
 
 	bindEvent( 'notifications_available', function( info ) {
 		if ( info.post_count > 0 && config.enable_forum_checks ) {
@@ -230,7 +335,13 @@ var Waper = (function() {
 			chrome.storage.sync.set({ config: new_conf }, function() {
 				config = new_conf;
 				console.log("config: updated");
+				console.log( config );
 			});
+		},
+		getCurrentGroup: function() { return current_group; },
+		reset: function() {
+			chrome.storage.sync.clear();
+			window.location.reload();
 		},
 		version: version
 	};

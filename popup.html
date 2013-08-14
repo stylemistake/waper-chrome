@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -13,14 +14,14 @@
 			<div class="item checkbox" data-param="enable_forum_checks">Получать текст ответов на форуме</div>
 			<div class="item checkbox" data-param="enable_inbox_checks">Получать текст личных сообщений</div>
 		</div>
-		<div id="subscriptions">
+		<div id="subscriptions" class="hidden">
 			<hr>
-			<div class="item link" data-href="http://waper.ru/forum/13"><b>Сообщество:</b> Siemens-Club</div>
-			<div class="item checkbox" data-param="enable_forum_checks">Получать новые темы</div>
-			<div class="item checkbox" data-param="enable_inbox_checks">Получать новые посты</div>
-			<div class="item link" data-href="http://waper.ru/forum/13">Пользователи онлайн</div>
+			<div class="item link" id="group_link" data-href="http://waper.ru/forum/13"><b>Сообщество:</b> Siemens-Club</div>
+			<div class="item checkbox" data-param="receive_topics">Получать новые темы</div>
+			<div class="item checkbox" data-param="receive_posts">Получать новые посты</div>
 		</div>
 		<hr>
+		<div class="item link" id="reset">Сбросить настройки</div>
 		<div class="item link" data-href="http://waper.ru/forum/topic/771266?pid=21782755">Support forum (тек. версия: <span id="version">?</span>)</div>
 	</div>
 </body>

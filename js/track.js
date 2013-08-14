@@ -18,13 +18,21 @@ _gaq.push(['_setAccount', 'UA-12842516-2']);
 
 	Track.app = function() {
 		if ( getAppData() === false ) return false;
-		_gaq.push([ "_trackPageview", getAppData() ]);
+		try {
+			_gaq.push([ "_trackPageview", getAppData() ]);
+		} catch ( e ) {
+			console.log( e );
+		}
 		return true;
 	};
 
 	Track.event = function( category, action, label ) {
 		if ( getAppData() === false ) return false;
-		_gaq.push([ "_trackEvent", category, action, getAppData() + ": " + label ]);
+		try {
+			_gaq.push([ "_trackEvent", category, action, getAppData() + ": " + label ]);
+		} catch ( e ) {
+			console.log( e );
+		}
 		return true;
 	};
 

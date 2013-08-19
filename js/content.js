@@ -13,6 +13,13 @@ $(document).ready( function() {
 	$("div.ad").remove();
 	$("a[href*='waplog']").parent().hide();
 
+	// Remove the eye-teasing orange background from the "Back to chat" banner
+	(function() {
+		var chatDiv = $('div.info:contains("В чат")');
+		chatDiv.removeClass('info');
+		chatDiv.addClass('btm')
+	})();
+
 	// Replace all foreign links with direct links
 	$("a[href*='/go/?u=']").each( function() {
 		var url = $(this).attr("href").match(/\?u=(.*)/)[1];

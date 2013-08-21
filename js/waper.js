@@ -20,7 +20,7 @@ var Waper = (function() {
 	var base_url = "http://waper.ru";
 
 	var config = {
-		update_interval: 10000,
+		update_interval: 8000,
 		enable_inbox_checks: true,
 		enable_forum_checks: true,
 		enable_analytics: true,
@@ -35,8 +35,16 @@ var Waper = (function() {
 	// Always know about the current group user stays in
 	var current_group = {};
 	chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
-		if ( request.group === undefined || request.group.name === undefined ) return false;
-		current_group = request.group;
+		if ( request.group !== undefined && request.group.name !== undefined ) {
+			current_group = request.group;
+		}
+		if ( request.posts !== undefined ) {
+			$.each( request.posts, function( key, value ) {
+				if ( notif_persist.posts.indexOf( value ) < 0 ) {
+					notif_persist.posts.push( value );
+				}
+			});
+		}
 	});
 
 	// Load config and sync in a background loop
@@ -49,10 +57,7 @@ var Waper = (function() {
 		}
 
 		(function loop() {
-			chrome.storage.sync.set({ config: config }, function() {
-				console.log("config: saved");
-			});
-			console.log( "Current subscriptions: ", config.subscriptions );
+			chrome.storage.sync.set({ config: config }, function() {});
 			setTimeout( loop, 30000 );
 		})();
 	});
@@ -232,7 +237,7 @@ var Waper = (function() {
 					}
 				}
 			});
-			subscr_data.date_updated = (new Date()).getTime() - 1000;
+			subscr_data.date_updated = (new Date()).getTime() - 1500;
 		});
 	}
 
@@ -255,7 +260,7 @@ var Waper = (function() {
 					}
 				}
 			});
-			subscr_data.date_updated = (new Date()).getTime() - 1000;
+			subscr_data.date_updated = (new Date()).getTime() - 1500;
 		});
 	}
 
@@ -268,13 +273,11 @@ var Waper = (function() {
 					var $rss = $( data, side_context ).find("a[href*='/rss/private/inbox']");
 					rss.messages = $rss.attr("href");
 					chrome.storage.sync.set({ rss: rss }, function() {
-						console.log("RSS retrieved!");
 						callback();
 					});
 				});
 			} else {
 				rss.messages = data.rss.messages;
-				console.log("RSS loaded!");
 				callback();
 			}
 		});
@@ -287,15 +290,21 @@ var Waper = (function() {
 		// Notification loop
 		(function loop() {
 			getSimpleNotifications( function() {
-				for ( var i in config.subscriptions ) {
-					var data = config.subscriptions[i];
-					if ( data.receive_topics ) getGroupTopicNotifications( data );
-					if ( data.receive_posts  ) getGroupPostNotifications( data );
-				}
+				fireEvent( 'notifications_received' );
 				setTimeout( loop, config.update_interval );
 			}, function() {
+				fireEvent( 'notifications_error' );
 				setTimeout( loop, config.update_interval );
 			});
+		})();
+
+		(function loop() {
+			for ( var i in config.subscriptions ) {
+				var data = config.subscriptions[i];
+				if ( data.receive_topics ) getGroupTopicNotifications( data );
+				if ( data.receive_posts  ) getGroupPostNotifications( data );
+			}
+			setTimeout( loop, 25000 );
 		})();
 
 		// Analytics loop
@@ -331,8 +340,6 @@ var Waper = (function() {
 		setConfig: function( new_conf ) {
 			chrome.storage.sync.set({ config: new_conf }, function() {
 				config = new_conf;
-				console.log("config: updated");
-				console.log( config );
 			});
 		},
 		getCurrentGroup: function() { return current_group; },

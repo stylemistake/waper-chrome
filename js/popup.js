@@ -53,6 +53,21 @@ var bg = chrome.extension.getBackgroundPage();
 		});
 
 
+
+		// Enable unsubscribe button if there are subscriptions
+
+		var subscr_num = Object.keys( config.subscriptions ).length;
+		if ( subscr_num > 0 ) $("#unsubscribe").removeClass("grayed").addClass("clickable");
+		$("#unsubscribe").on( "click", function() {
+			$(this).removeClass("clickable").addClass("grayed");
+			$("#subscriptions div.item.checkbox").toggleClass( "active", false );
+			config.subscriptions = {};
+			bg.Track.event( "Popup", "Subscription", "Unsubscribed from all" );
+			bg.Waper.setConfig( config );
+		});
+
+
+
 		// Subscription items
 
 		if ( group.id !== undefined ) {
@@ -81,6 +96,7 @@ var bg = chrome.extension.getBackgroundPage();
 				sub[param] = !value;
 				config.subscriptions[ group.id ] = sub;
 				$(this).toggleClass( "active", config[param] );
+				$("#unsubscribe").removeClass("grayed").addClass("clickable");
 				bg.Track.event( "Popup", "Subscription", group.id + " - " + param + " - " + ( value ? "disabled" : "enabled" ) );
 				bg.Waper.setConfig( config );
 			});

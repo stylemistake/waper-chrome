@@ -33,14 +33,15 @@
 		});
 	}
 
-	function notify( name, msg, url, timeout ) {
-		var n = webkitNotifications.createNotification( 'assets/icon_128.png', name, msg );
+	function notify( data, timeout ) {
+		if ( data.icon === undefined ) data.icon = 'assets/icon_128.png';
+		var n = webkitNotifications.createNotification( data.icon, data.name, data.message );
 		n.show();
 		n.onclick = function() {
 			n.cancel();
 			notification_count--;
 			updateBadge();
-			if ( url !== undefined ) focus( url );
+			if ( data.url !== undefined ) focus( data.url );
 		};
 		if ( timeout !== undefined ) setTimeout( function() { n.cancel() }, timeout );
 		return n;
@@ -50,12 +51,14 @@
 	var notification_count = 0;
 
 	function updateBadge() {
+		chrome.browserAction.setBadgeBackgroundColor({ color: [ 0, 0, 0, 0 ] });
 		if ( notification_count <= 0 ) {
 			chrome.browserAction.setBadgeText({ text: "" });
 		} else {
 			chrome.browserAction.setBadgeText({ text: "" + notification_count });
 		}
 	}
+
 
 
 	// chrome.browserAction.onClicked.addListener( function() {
@@ -65,32 +68,51 @@
 	var info_persist = { post_count: 0, message_count: 0 };
 
 	Waper.bind( 'notifications_available', function( info ) {
+		var data = { icon: 'assets/icon_128_gray.png', message: "" };
 		config = Waper.getConfig();
 		notification_count = info.post_count + info.message_count;
 		if ( ! config.enable_inbox_checks && info_persist.message_count < info.message_count ) {
-			notify( info.message_count + " сообщ. (ЛС)", "", base_url + "/r/ib.r", 9500 );
+			data.name = info.message_count + " сообщ. (ЛС)";
+			data.url = base_url + "/r/ib.r";
+			notify( data, 9500 );
 		}
 		if ( ! config.enable_forum_checks && info_persist.post_count < info.post_count ) {
-			notify( info.post_count + " отв. в теме", "", base_url + "/office/notify/", 9500 );
+			data.name = info.post_count + " отв. в теме";
+			data.url = base_url + "/office/notify/";
+			notify( data, 9500 );
 		}
 		info_persist = info;
 		updateBadge();
 	});
 
+	// Hint, when waper.ru is unavailable
+	Waper.bind( 'notifications_error', function() {
+		chrome.browserAction.setBadgeBackgroundColor({ color: [ 90, 90, 90, 255 ] });
+		chrome.browserAction.setIcon({ path: 'assets/icon_128_gray.png' });
+		chrome.browserAction.setBadgeText({ text: "?" });
+	});
+
+	Waper.bind( 'notifications_received', function() {
+		chrome.browserAction.setIcon({ path: 'assets/icon.png' });
+		updateBadge();
+	})
+
 	Waper.bind( 'new_post', function( data ) {
-		notify( data.name, data.message, data.url );
+		notify( data );
 	});
 
 	Waper.bind( 'new_message', function( data ) {
-		notify( data.name, data.message, data.url );
+		notify( data );
 	});
 
 	Waper.bind( 'new_group_topic', function( data ) {
-		notify( data.name, data.message, data.url, 9500 );
+		data.icon = 'assets/icon_128_gray.png';
+		notify( data, 9500 );
 	});
 
 	Waper.bind( 'new_group_post', function( data ) {
-		notify( data.name, data.message, data.url, 9500 );
+		data.icon = 'assets/icon_128_gray.png';
+		notify( data, 9500 );
 	});
 
 

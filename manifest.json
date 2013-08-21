@@ -12,7 +12,7 @@
 	},
 	"name": "Waper",
 	"permissions": [ "tabs", "notifications", "storage", "http://waper.ru/" ],
-	"web_accessible_resources": [ "assets/icon_128.png", "assets/icon.png" ],
+	"web_accessible_resources": [ "assets/icon_128.png", "assets/icon_128_gray.png", "assets/icon.png" ],
 	"content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
 	"content_scripts": [{
 		"matches": [ "http://waper.ru/*" ],

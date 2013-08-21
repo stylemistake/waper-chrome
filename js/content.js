@@ -66,6 +66,18 @@ $(document).ready( function() {
 
 	})();
 
+	// Send visible posts to the background process
+	(function() {
+		if ( location.href.match(/\/forum\/topic\/[0-9]+$/) !== null ) {
+			var posts = [];
+			$("a[name]").each( function() {
+				var post_id = $(this).attr("name");
+				if ( $.isNumeric( post_id ) ) posts.push( parseInt( post_id ) );
+			});
+			chrome.runtime.sendMessage({ posts: posts });
+		}
+	})();
+
 	// Initialize the WysiBB editor
 	(function() {
 		var urlsRE = /http:\/\/waper.ru\/r\/.+|http:\/\/waper.ru\/office\/talk\/.+|http:\/\/waper.ru\/office\/group\/forum\/write\/.+/

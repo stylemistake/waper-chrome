@@ -8,11 +8,11 @@
 
 	chrome.storage.sync.get( "version", function( data ) {
 		if ( data.version === undefined || data.version.major < version.major || data.version.minor < version.minor ) {
-			notify(
-				"Обновлено до версии " + version.major + "." + version.minor,
-				version.changes.join("\r\n"),
-				version.url
-			);
+			notify({
+				name: "Обновлено до версии " + version.major + "." + version.minor,
+				message: version.changes.join("\r\n"),
+				url: version.url
+			});
 			chrome.storage.sync.set({ "version": version });
 		}
 	});

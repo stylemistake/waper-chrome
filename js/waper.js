@@ -5,14 +5,11 @@ var Waper = (function() {
 	if ( typeof jQuery == 'undefined' ) throw new Error("jQuery is required; check the script order.");
 
 	var version = {
-		major: 0,
-		minor: 5,
+		major: 1,
+		minor: 0,
 		changes: [
-			"[add] WysiBB редактор",
-			"[add] Вырезание рекламы",
-			"[add] Подписки на сообщества",
-			"[fix] Выпрямление ссылок без биндов на клик",
-			"[fix] Нотификации теперь не должны застрявать"
+			"Поздравляем с обновлением до мажорного релиза с кучей всякой новой всячины :).",
+			"Нажми для подробностей обновления."
 		],
 		url: "http://waper.ru/forum/topic/771266"
 	};
@@ -75,7 +72,7 @@ var Waper = (function() {
 			url: base_url + resource,
 			type: method,
 			data: data,
-			timeout: 15000,
+			timeout: 25000,
 			success: success,
 			error: function( a, b, c ) {
 				try {
@@ -157,7 +154,7 @@ var Waper = (function() {
 
 						var sender = $tpanel.find("a[href*='/user/']").text();
 
-						notif_data.message = $body.find(".mpanel").text().match(/:\s?(.*)/)[1];
+						notif_data.message = $body.find(".mpanel").accessibleText().match(/:\s?(.*)/)[1];
 						notif_data.name = sender + " " + notif_data.name;
 						fireEvent( 'new_post', notif_data );
 					});
@@ -171,13 +168,13 @@ var Waper = (function() {
 		return request( "GET", rss.messages, function( data ) {
 			var $items = $( data, side_context ).find("item");
 			$items.each( function() {
+				var $message = $( "<div>" + $(this).find("description").text() + "</div>", side_context );
 				var notif_data = {
 					id: $(this).find("guid").text().match(/[0-9]+/)[0],
 					url: base_url + "/office/talk/inbox/",
-					//name: $(this).find("title").text().match(/\s(.+)/)[1],
 					name: "Сообщение " + $(this).find("title").text(),
-					message: $(this).find("description").text().trim()
-				}
+					message: $message.accessibleText().trim()
+				};
 				if ( limit-- <= 0 ) return true;
 				if ( notif_persist.messages.indexOf( notif_data.id ) < 0 ) {
 					notif_persist.messages.push( notif_data.id );
@@ -246,11 +243,12 @@ var Waper = (function() {
 			var $xml = $( data, side_context );
 			var $items = $xml.find("item");
 			$items.each( function() {
+				var $message = $( "<div>" + $(this).find("description").text() + "</div>", side_context );
 				var notif_data = {
 					id: $(this).find("guid").text().match(/[0-9]+/)[0],
 					url: $(this).find("guid").text(),
 					name: $(this).find("title").text().trim().match(/от\s(.*)/)[1],
-					message: $(this).find("description").text().trim().replace(/(<([^>]+)>)/ig,"")
+					message: $message.accessibleText().trim()
 				};
 				if ( notif_persist.posts.indexOf( notif_data.id ) < 0 ) {
 					notif_persist.posts.push( notif_data.id );

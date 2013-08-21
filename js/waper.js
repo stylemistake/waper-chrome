@@ -25,6 +25,7 @@ var Waper = (function() {
 		enable_forum_checks: true,
 		enable_analytics: true,
 		subscriptions: {},
+		subscr_update_interval: 30000,
 	};
 
 	var events = {};
@@ -70,7 +71,7 @@ var Waper = (function() {
 		if ( failure === undefined ) failure = function( data ) {
 			console.log( "error: " + data.message );
 		};
-		$.ajax({
+		return $.ajax({
 			url: base_url + resource,
 			type: method,
 			data: data,
@@ -114,7 +115,7 @@ var Waper = (function() {
 
 	function getSimpleNotifications( callback, fallback ) {
 		if ( callback === undefined ) callback = function(){};
-		request( "GET", "/office/", function( data ) {
+		return request( "GET", "/office/", function( data ) {
 			var $html = $( data, side_context );
 			var messages  = $html.find("a[href='/office/talk/inbox/']").text().match(/[0-9]+/);
 			var posts     = $html.find("a[href='/office/notify/']").text().match(/[0-9]+/);
@@ -138,7 +139,7 @@ var Waper = (function() {
 	}
 
 	function getForumNotifications() {
-		request( "GET", "/office/notify/", function( data ) {
+		return request( "GET", "/office/notify/", function( data ) {
 			var $body = $( data, side_context ).filter(".body");
 			var $posts = $body.find("a[href*='/forum/post/']");
 
@@ -162,13 +163,12 @@ var Waper = (function() {
 					});
 				}
 			});
-
 		});
 	}
 
 	function getInboxNotifications( limit ) {
 		if ( limit === undefined ) limit = 10;
-		request( "GET", rss.messages, function( data ) {
+		return request( "GET", rss.messages, function( data ) {
 			var $items = $( data, side_context ).find("item");
 			$items.each( function() {
 				var notif_data = {
@@ -218,7 +218,7 @@ var Waper = (function() {
 	// }
 
 	function getGroupTopicNotifications( subscr_data ) {
-		request( "GET", "/rss/topic" + subscr_data.group_id + ".xml", function( data ) {
+		return request( "GET", "/rss/topic" + subscr_data.group_id + ".xml", function( data ) {
 			var $xml = $( data, side_context );
 			var $items = $xml.find("item");
 			var title = $( $xml.find("title")[0] ).text().match(/"(.*?)"/)[1];
@@ -232,7 +232,7 @@ var Waper = (function() {
 				if ( notif_persist.topics.indexOf( notif_data.id ) < 0 ) {
 					notif_persist.topics.push( notif_data.id );
 					var date = subscr_data.date_updated;
-					if ( date !== undefined && Helpers.getDateDiff( date ) > config.update_interval ) {
+					if ( date !== undefined && Helpers.getDateDiff( date ) > config.subscr_update_interval ) {
 						fireEvent( 'new_group_topic', notif_data );
 					}
 				}
@@ -242,7 +242,7 @@ var Waper = (function() {
 	}
 
 	function getGroupPostNotifications( subscr_data ) {
-		request( "GET", "/rss/post" + subscr_data.group_id + ".xml", function( data ) {
+		return request( "GET", "/rss/post" + subscr_data.group_id + ".xml", function( data ) {
 			var $xml = $( data, side_context );
 			var $items = $xml.find("item");
 			$items.each( function() {
@@ -255,7 +255,7 @@ var Waper = (function() {
 				if ( notif_persist.posts.indexOf( notif_data.id ) < 0 ) {
 					notif_persist.posts.push( notif_data.id );
 					var date = subscr_data.date_updated;
-					if ( date !== undefined && Helpers.getDateDiff( date ) >= config.update_interval ) {
+					if ( date !== undefined && Helpers.getDateDiff( date ) >= config.subscr_update_interval ) {
 						fireEvent( 'new_group_post', notif_data );
 					}
 				}
@@ -298,13 +298,20 @@ var Waper = (function() {
 			});
 		})();
 
+		// Subscription loop
 		(function loop() {
+			var defs = [];
 			for ( var i in config.subscriptions ) {
 				var data = config.subscriptions[i];
-				if ( data.receive_topics ) getGroupTopicNotifications( data );
-				if ( data.receive_posts  ) getGroupPostNotifications( data );
+				if ( data.receive_topics ) defs.push( getGroupTopicNotifications( data ) );
+				if ( data.receive_posts  ) defs.push( getGroupPostNotifications( data ) );
 			}
-			setTimeout( loop, 25000 );
+			$.when.apply( $, defs ).then( function() {
+				setTimeout( loop, config.subscr_update_interval );
+			}, function() {
+				console.log("subscriptions: error");
+				setTimeout( loop, config.subscr_update_interval );
+			});
 		})();
 
 		// Analytics loop

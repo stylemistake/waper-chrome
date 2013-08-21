@@ -68,7 +68,7 @@ $(document).ready( function() {
 
 	// Send visible posts to the background process
 	(function() {
-		if ( location.href.match(/\/forum\/topic\/[0-9]+$/) !== null ) {
+		if ( location.href.match(/\/forum\/topic\/[0-9]+/) !== null ) {
 			var posts = [];
 			$("a[name]").each( function() {
 				var post_id = $(this).attr("name");

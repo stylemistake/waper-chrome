@@ -35,15 +35,20 @@ body, html {
 	background: #114662 url('../assets/checkbox-active-hover.png') no-repeat;
 }
 
-.item.checkbox:hover, .item.link:hover {
+.item.clickable { cursor: pointer; }
+
+.item.clickable:hover {
 	background-color: #114662 !important;
 	color: #FFF;
-	cursor: pointer;
 }
 
-.item.checkbox:active, .item.link:active {
+.item.clickable:active {
 	background-color: #082230 !important;
 	color: #FFF;
+}
+
+.item.grayed {
+	color: #888;
 }
 
 .bold { font-weight: bold; }

@@ -8,21 +8,22 @@
 </head>
 <body>
 	<div class="body">
-		<div class="item link" data-href="http://waper.ru/office/">Личный кабинет</div>
+		<div class="item clickable link" data-href="http://waper.ru/office/">Личный кабинет</div>
 		<hr>
 		<div id="config">
-			<div class="item checkbox" data-param="enable_forum_checks">Получать текст ответов на форуме</div>
-			<div class="item checkbox" data-param="enable_inbox_checks">Получать текст личных сообщений</div>
-		</div>
-		<div id="subscriptions" class="hidden">
-			<hr>
-			<div class="item link" id="group_link" data-href="http://waper.ru/forum/13"><b>Сообщество:</b> Siemens-Club</div>
-			<div class="item checkbox" data-param="receive_topics">Получать новые темы</div>
-			<div class="item checkbox" data-param="receive_posts">Получать новые посты</div>
+			<div class="item clickable checkbox" data-param="enable_forum_checks">Получать текст ответов на форуме</div>
+			<div class="item clickable checkbox" data-param="enable_inbox_checks">Получать текст личных сообщений</div>
 		</div>
 		<hr>
-		<div class="item link" id="reset">Сбросить настройки</div>
-		<div class="item link" data-href="http://waper.ru/forum/topic/771266?pid=21782755">Support forum (тек. версия: <span id="version">?</span>)</div>
+		<div id="subscriptions" class="hidden">
+			<div class="item clickable link" id="group_link" data-href="http://waper.ru/forum/13"><b>Сообщество:</b> Siemens-Club</div>
+			<div class="item clickable checkbox" data-param="receive_topics">Получать новые темы</div>
+			<div class="item clickable checkbox" data-param="receive_posts">Получать новые посты</div>
+		</div>
+		<div class="item grayed" title="Зайдите в любое сообщество для включения настроек подписки">Вы не в сообществе</div>
+		<hr>
+		<div class="item clickable" id="reset">Сбросить настройки</div>
+		<div class="item clickable link" data-href="http://waper.ru/forum/topic/771266?pid=21782755">Support forum (тек. версия: <span id="version">?</span>)</div>
 	</div>
 </body>
 </html>

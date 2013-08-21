@@ -24,7 +24,6 @@ var bg = chrome.extension.getBackgroundPage();
 		$("#version").html( version.major + "." + version.minor );
 
 		$("#reset").on( "click", function( event ) {
-			event.stopPropagation();
 			if ( confirm("Вы уверены, что хотите сбросить все настройки?") ) {
 				bg.Waper.reset();
 				window.close();

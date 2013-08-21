@@ -12,6 +12,7 @@ http://waper.ru/forum/topic/771266)
 
 **Changelog:** *(russian)*
 ```
+version 0.5:
 [add] WysiBB редактор
 [add] Вырезание рекламы
 [add] Подписки на сообщества

@@ -84,7 +84,7 @@ $(document).ready( function() {
 		if (urlsRE.test(window.location.href)) {
 			$("textarea").sceditor({
 				plugins: "bbcode",
-				toolbar: "bold,italic,strike|emoticon|code,image,link|time,date|maximize,source",
+				toolbar: "bold,italic,strike|emoticon|code,image,link|time,date|removeformat|maximize,source",
 				style: chrome.extension.getURL("css/sceditor-content.css"),
 				locale: "ru",
 				width: "100%",

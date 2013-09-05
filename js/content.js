@@ -82,6 +82,16 @@ $(document).ready( function() {
 	(function() {
 		var urlsRE = /http:\/\/waper.ru\/r\/.+|http:\/\/waper.ru\/office\/talk\/.+|http:\/\/waper.ru\/office\/group\/forum\/write\/.+/
 		if (urlsRE.test(window.location.href)) {
+			
+			// Ctrl+Enter submission
+			$(document).keydown( function (e) {
+				if ( e.ctrlKey && e.keyCode == 13 ) {
+					e.preventDefault();
+					e.stopPropagation();
+					$("form input[type=submit]").click();
+				}
+			});
+
 			var bodyInnerHtml = $("body").html();
 			var re = /<textarea.+textarea>/;
 			var textareaCode = bodyInnerHtml.match(re)[0];

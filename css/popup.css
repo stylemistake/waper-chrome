@@ -53,3 +53,12 @@ body, html {
 
 .bold { font-weight: bold; }
 .hidden { display: none; }
+input {
+	display: inline-block;
+	margin: 0; padding: 0; border: 0;
+	background: #EEE;
+	width: 46px; height: 12px;
+	font: 10px sans-serif;
+	line-height: 12px;
+	vertical-align: baseline;
+}

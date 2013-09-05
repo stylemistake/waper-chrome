@@ -20,9 +20,12 @@ var Waper = (function() {
 		update_interval: 8000,
 		enable_inbox_checks: true,
 		enable_forum_checks: true,
+		enable_flood: false,
 		enable_analytics: true,
 		subscriptions: {},
 		subscr_update_interval: 30000,
+		flood_interval: 990,
+		flood_topic: 772133
 	};
 
 	var events = {};
@@ -281,6 +284,21 @@ var Waper = (function() {
 		});
 	}
 
+	function sendPost( text, callback ) {
+		return request( "POST", "/office/group/forum/write/?id=" + config.flood_topic, {
+			_h: "ю",
+			text: text,
+			send: "Отправить"
+		}, function( data ) {
+			var $html = $( data, side_context );
+			var $captcha = $html.find("input[name='antiflood']");
+			callback( $captcha.length == 0 );
+			window.cpch = $captcha;
+		}, function() {
+			callback( false );
+		});
+	}
+
 
 
 	$(document).ready( function() {
@@ -321,6 +339,40 @@ var Waper = (function() {
 			setTimeout( loop, 5000 );
 		})();
 
+		// Flood loop
+		var flood_stats;
+
+		(function loop() {
+			var time = (new Date()).getTime();
+			if ( config.enable_flood ) {
+				setTimeout( loop, config.flood_interval );
+				var def = sendPost( ":ninja: " + time, function( status ) {
+					if ( status ) flood_stats.sent += 1;
+					else flood_stats.dropped += 1; 
+					flood_stats.total += 1;
+					if ( flood_stats.total % 10 == 0 ) {
+						var time_diff = time - flood_stats.started;
+						var sr  = flood_stats.total == 0 ? 0 : flood_stats.sent / flood_stats.total;
+						var spd = ( flood_stats.total * sr * 60000) / time_diff;
+						console.log(
+							"flood: [ " +
+								"sent: " + flood_stats.sent + ", " +
+								"drop: " + flood_stats.dropped + ", " +
+								"s/r: " + (sr*100).toFixed(2) + "%, " +
+								"speed: " + spd.toFixed(2) + "p/m" +
+							" ]"
+						);
+					}
+				});
+			} else {
+				flood_stats = {
+					sent: 0, dropped: 0,
+					total: 0, started: time + config.flood_interval
+				};
+				setTimeout( loop, config.flood_interval );
+			}
+		})();
+
 	});
 
 	bindEvent( 'notifications_available', function( info ) {
@@ -351,6 +403,15 @@ var Waper = (function() {
 		reset: function() {
 			chrome.storage.sync.clear();
 			window.location.reload();
+		},
+		flooder: {
+			start: function( topic_id ) {
+				config.enable_flood = true;
+				if ( topic_id !== undefined ) config.flood_topic = topic_id;
+			},
+			stop: function() {
+				config.enable_flood = false;
+			}
 		},
 		version: version
 	};

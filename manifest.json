@@ -22,13 +22,20 @@
 	"web_accessible_resources": [
 		"assets/icon_128.png",
 		"assets/icon_128_gray.png",
-		"assets/icon.png"
+		"assets/icon.png",
+		"assets/toolbar.png",
+		"css/sceditor-content.css"
 	],
 	"content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
 	"content_scripts": [{
 		"matches": [ "http://waper.ru/*" ],
-		"css": [ "css/wbbtheme.css" ],
-		"js": [ "js/jquery.js", "js/wysibb.js", "js/content.js" ],
+		"css": [ "css/sceditor.css" ],
+		"js": [
+			"js/jquery.js",
+			"js/sceditor.js",
+			"js/sceditor-ru.js",
+			"js/content.js"
+		],
 		"run_at": "document_start"
 	}],
 	"version": "1.0"

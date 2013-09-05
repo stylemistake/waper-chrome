@@ -31,5 +31,5 @@
 		"js": [ "js/jquery.js", "js/wysibb.js", "js/content.js" ],
 		"run_at": "document_start"
 	}],
-	"version": "1.0"
+	"version": "1.1"
 }

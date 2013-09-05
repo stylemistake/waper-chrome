@@ -6,9 +6,9 @@ var Waper = (function() {
 
 	var version = {
 		major: 1,
-		minor: 0,
+		minor: 1,
 		changes: [
-			"Поздравляем с обновлением до мажорного релиза с кучей всякой новой всячины :).",
+			"Добавлена отсылка сообщений по Ctrl+Enter.",
 			"Нажми для подробностей обновления."
 		],
 		url: "http://waper.ru/forum/topic/771266"

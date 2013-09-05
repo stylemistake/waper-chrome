@@ -12,6 +12,9 @@ http://waper.ru/forum/topic/771266)
 
 **Changelog:** *(russian)*
 ```
+version 1.1:
+[add] Добавлена отсылка сообщений по Ctrl+Enter
+
 version 1.0:
 [add] Подписки на сообщества
 [add] WysiBB редактор

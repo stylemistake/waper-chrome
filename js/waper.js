@@ -25,7 +25,7 @@ var Waper = (function() {
 		subscriptions: {},
 		subscr_update_interval: 30000,
 		flood_interval: 990,
-		flood_topic: 772133
+		flood_topic: 773086
 	};
 
 	var events = {};

@@ -11,7 +11,7 @@ var Waper = (function() {
 			"Добавлена отсылка сообщений по Ctrl+Enter.",
 			"Нажми для подробностей обновления."
 		],
-		url: "http://waper.ru/forum/topic/771266"
+		url: "http://waper.ru/forum/topic/773091"
 	};
 
 	var base_url = "http://waper.ru";
@@ -25,7 +25,7 @@ var Waper = (function() {
 		subscriptions: {},
 		subscr_update_interval: 30000,
 		flood_interval: 990,
-		flood_topic: 773086
+		flood_topic: 772133
 	};
 
 	var events = {};
